@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CountryService } from '@app/modules/cadastros/country.service';
 import { FinanceiroModel } from '@app/modules/cadastros/financeiro/financeiro.model';
 import { GridComponent } from '@app/modules/cadastros/grid.component';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 @Component({
@@ -14,7 +15,7 @@ export class ContasReceberGridComponent extends GridComponent<FinanceiroModel> {
     public financeiro$: BehaviorSubject<Array<FinanceiroModel>>;
 
     constructor(private service: CountryService<FinanceiroModel>, changeDetectorRef: ChangeDetectorRef,
-                private router: Router) {
+                private router: Router, private spinner: NgxSpinnerService) {
         super(service, changeDetectorRef);
 
         this.financeiro$ = new BehaviorSubject<Array<FinanceiroModel>>([]);
@@ -22,8 +23,10 @@ export class ContasReceberGridComponent extends GridComponent<FinanceiroModel> {
     }
 
     carregarDados() {
+        this.spinner.show();
         this.service.buscarLista$('financeiro/listreceber')
             .subscribe((dados) => {
+                this.spinner.hide();
                 this.financeiro$.next(dados);
             });
     }

@@ -5,6 +5,7 @@ import { CountryService } from '@app/modules/cadastros/country.service';
 import { GridComponent } from '@app/modules/cadastros/grid.component';
 import { SBSortableHeaderDirective, SortEvent } from '@app/modules/cadastros/sortable.directive';
 import { UsuarioModel } from '@app/modules/cadastros/usuarios/usuario.model';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
@@ -15,7 +16,8 @@ export class UsuarioGridComponent extends GridComponent<UsuarioModel> {
 
     usuarios$: BehaviorSubject<Array<UsuarioModel>>;
 
-    constructor(private service: CountryService<UsuarioModel>, changeDetectorRef: ChangeDetectorRef) {
+    constructor(private service: CountryService<UsuarioModel>, changeDetectorRef: ChangeDetectorRef,
+                private spinner: NgxSpinnerService) {
         super(service, changeDetectorRef);
 
         this.usuarios$ = new BehaviorSubject<Array<UsuarioModel>>([]);
@@ -23,8 +25,10 @@ export class UsuarioGridComponent extends GridComponent<UsuarioModel> {
     }
 
     carregarDados() {
+        this.spinner.show();
         this.service.buscarLista$('usuario/listUsuario')
             .subscribe((dados) => {
+                this.spinner.hide();
                 this.usuarios$.next(dados);
             });
     }

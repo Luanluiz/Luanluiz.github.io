@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LINK } from '@app/modules/cadastros/country.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BehaviorSubject, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
@@ -17,7 +18,8 @@ export class LoginComponent implements OnInit {
     public form$: BehaviorSubject<FormGroup>;
     public msg$: BehaviorSubject<string>;
 
-    constructor(private formBuilder: FormBuilder, private router: Router, private http: HttpClient) {
+    constructor(private formBuilder: FormBuilder, private router: Router, private http: HttpClient,
+                private spinner: NgxSpinnerService) {
         this.form$ = new BehaviorSubject<FormGroup>(formBuilder.group({ usuario: '', senha: '' }));
         this.msg$ = new BehaviorSubject<string>('');
     }
@@ -27,6 +29,7 @@ export class LoginComponent implements OnInit {
     }
 
     public logar() {
+        this.spinner.show();
         this.form$
             .pipe(
                 switchMap((form) => {
@@ -44,6 +47,7 @@ export class LoginComponent implements OnInit {
                 }),
             )
             .subscribe((obj: { ok: boolean, form: FormGroup }) => {
+                this.spinner.hide();
                 this.msg$.next('');
 
                 if (obj && obj.ok) {

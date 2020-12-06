@@ -7,6 +7,7 @@ import { ClienteModel } from '@app/modules/cadastros/clientes/cliente.model';
 import { CountryService, LINK } from '@app/modules/cadastros/country.service';
 import { ContasReceberModel } from '@app/modules/cadastros/financeiro/contas-receber/contas-receber.model';
 import { FornecedorModel } from '@app/modules/cadastros/fornecedores/fornecedor.model';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators';
 
@@ -20,7 +21,8 @@ export class ContasReceberFormComponent implements OnInit {
     public cliente$: Observable<Array<ClienteModel>>;
 
     constructor(public service: CountryService<ContasReceberModel>, public router: ActivatedRoute,
-                private formBuilder: FormBuilder, private local: Location, private http: HttpClient) {
+                private formBuilder: FormBuilder, private local: Location, private http: HttpClient,
+                private spinner: NgxSpinnerService) {
 
         this.form$ = new BehaviorSubject<FormGroup>(this.formBuilder.group(new ContasReceberModel()));
         this.cliente$ = this.http.get<ClienteModel[]>(`${LINK}entidades/listCliente`)
@@ -34,11 +36,13 @@ export class ContasReceberFormComponent implements OnInit {
                 filter((param) => param[`id`]),
                 withLatestFrom(this.form$, (params: Params, form: FormGroup) => ({ params, form })),
                 switchMap((obj: { params: Params, form: FormGroup }) => {
+                    this.spinner.show();
                     return this.service.getDado$('financeiro/financeiro/', +obj.params[`id`])
                         .pipe(map((dado) => ({ dado, form: obj.form })));
                 }),
             )
             .subscribe((obj: { dado: ContasReceberModel, form: FormGroup }) => {
+                this.spinner.hide();
                 obj.form.patchValue(obj.dado);
                 if (obj.dado.status === 'Quitado') {
                     obj.form.get('nomeEntidade')?.disable();
@@ -54,11 +58,13 @@ export class ContasReceberFormComponent implements OnInit {
         this.form$
             .pipe(
                 switchMap((form: FormGroup) => {
+                    this.spinner.show();
                     const financeiro: ContasReceberModel = form.getRawValue();
                     return this.service.gravar$('financeiro/salvar', financeiro)
                         .pipe(map((financeiro) => financeiro));
                 }))
             .subscribe((financeiro) => {
+                this.spinner.hide();
                 this.local.back();
             });
 

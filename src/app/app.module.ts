@@ -13,6 +13,7 @@ import { CountryService } from '@app/modules/cadastros/country.service';
 // import { UsuarioRoutingModule } from '@app/modules/cadastros/usuario-routing.module';
 import { UsuarioModule } from '@app/modules/cadastros/usuario.module';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -28,6 +29,7 @@ import { AppComponent } from './app.component';
         HttpClientModule,
         ReactiveFormsModule,
         LoginModule,
+        NgxSpinnerModule,
     ],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
